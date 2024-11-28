@@ -8,3 +8,4 @@ The platform aims to bring threat intelligence from leading vendors under a sing
 - Clone the repository in you web-server folder
 - start your node server (index.js) > node index.js
 - Browse threatintel.html
+
