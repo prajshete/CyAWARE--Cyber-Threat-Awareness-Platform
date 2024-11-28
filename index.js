@@ -3,6 +3,7 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const cors = require('cors');
 const RSSParser = require('rss-parser');
+const he = require('he');
 
 
 const app = express();
@@ -113,16 +114,35 @@ async function fetchDRBlogs() {
 async function fetchCVE() {
     try {
         const feed = await parser.parseURL('https://cvefeed.io/rssfeed/severity/high.xml');
-        const cve = feed.items.map(item => ({
-            title: item.title,
-            url: item.link
-        }));
+       // console.log('Feed:', feed); // Log the entire feed object
+       // console.log('Feed Items:', feed.items);
+        const cve = feed.items.map(item => {
+            let description = item.content || '';
+            description = description.replace(/\n/g, ' ');
+            //console.log(description);
+            
+            // Updated regex to extract severity and score
+            const severityMatch = description.match(/<strong>Severity:<\/strong>\s*([\d.]+)\s*\|\s*(\w+)/is);
+            const severity = severityMatch
+                ? { score: severityMatch[1], level: severityMatch[2] }
+                : { score: "N/A", level: "UNKNOWN" };
+
+            return {
+                title: item.title,
+                url: item.link,
+                severity: severity.level, // Severity level (e.g., HIGH)
+                score: severity.score    // Severity score (e.g., 8.0)
+            };
+        });
+
         return cve;
     } catch (error) {
         console.error('Error fetching RSS feed:', error.message);
         return [];
     }
 }
+
+
 
 app.get('/api/get-cs-blogs', async (req, res) => {
     try {

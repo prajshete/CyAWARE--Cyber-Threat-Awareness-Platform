@@ -160,7 +160,7 @@ async function fetchDRBlogs() {
 
 
 
-async function fetchCVEFeed() {
+async function fetchCVE() {
     try {
         // Fetch data from the API
         const response = await fetch('http://localhost:3000/api/get-cve-feed');
@@ -175,25 +175,25 @@ async function fetchCVEFeed() {
         table.style.width = '100%';
         table.style.borderCollapse = 'collapse';
         table.style.marginTop = '20px';
+        table.style.animation = 'fadeIn 1s ease'; // Add animation for the table
 
         // Create the table header
         const thead = document.createElement('thead');
         const headerRow = document.createElement('tr');
-        
-        const cveHeader = document.createElement('th');
-        cveHeader.textContent = 'CVE';
-        cveHeader.style.border = '1px solid #ccc';
-        cveHeader.style.padding = '10px';
-        cveHeader.style.backgroundColor = '#f3f4f6';
 
-        const descHeader = document.createElement('th');
-        descHeader.textContent = 'Description';
-        descHeader.style.border = '1px solid #ccc';
-        descHeader.style.padding = '10px';
-        descHeader.style.backgroundColor = '#f3f4f6';
+        const headers = ['CVE', 'Severity', 'Score']; // Table headers
+        headers.forEach(headerText => {
+            const th = document.createElement('th');
+            th.textContent = headerText;
+            th.style.border = '1px solid #ddd';
+            th.style.padding = '12px';
+            th.style.backgroundColor = '#f3f4f6';
+            th.style.textAlign = 'left';
+            th.style.fontWeight = 'bold';
+            th.style.color = '#1e293b'; // Dark text for headers
+            headerRow.appendChild(th);
+        });
 
-        headerRow.appendChild(cveHeader);
-        headerRow.appendChild(descHeader);
         thead.appendChild(headerRow);
         table.appendChild(thead);
 
@@ -202,25 +202,57 @@ async function fetchCVEFeed() {
 
         cves.forEach(cve => {
             const row = document.createElement('tr');
+            row.style.transition = 'background-color 0.3s ease'; // Row hover effect
 
             // CVE column (as a clickable link)
             const cveCell = document.createElement('td');
             const cveLink = document.createElement('a');
-            cveLink.href = cve.link; // Replace with the actual feed link
+            cveLink.href = cve.url; // Use the URL from the API
             cveLink.textContent = cve.title;
             cveLink.target = '_blank'; // Open in a new tab
+            cveLink.style.color = '#007bff'; // Link color
+            cveLink.style.textDecoration = 'none';
+            cveLink.addEventListener('mouseover', () => {
+                cveLink.style.textDecoration = 'underline';
+            });
+            cveLink.addEventListener('mouseout', () => {
+                cveLink.style.textDecoration = 'none';
+            });
             cveCell.appendChild(cveLink);
-            cveCell.style.border = '1px solid #ccc';
-            cveCell.style.padding = '10px';
+            cveCell.style.border = '1px solid #ddd';
+            cveCell.style.padding = '12px';
 
-            // Description column
-            const descCell = document.createElement('td');
-            descCell.textContent = cve.description;
-            descCell.style.border = '1px solid #ccc';
-            descCell.style.padding = '10px';
+            // Severity column
+            const severityCell = document.createElement('td');
+            severityCell.textContent = cve.severity;
+            severityCell.style.border = '1px solid #ddd';
+            severityCell.style.padding = '12px';
+            severityCell.style.color =
+                cve.severity === 'CRITICAL'
+                    ? '#660000' // Dark red for critical
+                    : cve.severity === 'HIGH'
+                    ? '#ff1a1a' // red for high
+                    : '#28a745'; // Green for others
+            severityCell.style.fontWeight = 'bold';
 
+            // Score column
+            const scoreCell = document.createElement('td');
+            scoreCell.textContent = cve.score;
+            scoreCell.style.border = '1px solid #ddd';
+            scoreCell.style.padding = '12px';
+            scoreCell.style.color =
+                cve.severity === 'CRITICAL'
+                    ? '#660000' // Dark red for critical
+                    : cve.severity === 'HIGH'
+                    ? '#ff1a1a' // Red for high
+                    : '#28a745'; // Green for others
+            scoreCell.style.fontWeight = 'bold';
+
+            // Append cells to the row
             row.appendChild(cveCell);
-            row.appendChild(descCell);
+            row.appendChild(severityCell);
+            row.appendChild(scoreCell);
+
             tbody.appendChild(row);
         });
 
@@ -232,8 +264,11 @@ async function fetchCVEFeed() {
 }
 
 
+
+
 // Fetch and render blogs when the page loads
 fetchCSBlogs();
 fetchMandiantBlogs();
 fetchDFIRBlogs();
 fetchDRBlogs();
+fetchCVE();
