@@ -158,6 +158,80 @@ async function fetchDRBlogs() {
     }
 }
 
+
+
+async function fetchCVEFeed() {
+    try {
+        // Fetch data from the API
+        const response = await fetch('http://localhost:3000/api/get-cve-feed');
+        const cves = await response.json();
+
+        // Select the CVE container (where the table will be displayed)
+        const cveContainer = document.getElementById('cves-container');
+        cveContainer.innerHTML = ''; // Clear any existing content
+
+        // Create a table
+        const table = document.createElement('table');
+        table.style.width = '100%';
+        table.style.borderCollapse = 'collapse';
+        table.style.marginTop = '20px';
+
+        // Create the table header
+        const thead = document.createElement('thead');
+        const headerRow = document.createElement('tr');
+        
+        const cveHeader = document.createElement('th');
+        cveHeader.textContent = 'CVE';
+        cveHeader.style.border = '1px solid #ccc';
+        cveHeader.style.padding = '10px';
+        cveHeader.style.backgroundColor = '#f3f4f6';
+
+        const descHeader = document.createElement('th');
+        descHeader.textContent = 'Description';
+        descHeader.style.border = '1px solid #ccc';
+        descHeader.style.padding = '10px';
+        descHeader.style.backgroundColor = '#f3f4f6';
+
+        headerRow.appendChild(cveHeader);
+        headerRow.appendChild(descHeader);
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
+
+        // Create the table body
+        const tbody = document.createElement('tbody');
+
+        cves.forEach(cve => {
+            const row = document.createElement('tr');
+
+            // CVE column (as a clickable link)
+            const cveCell = document.createElement('td');
+            const cveLink = document.createElement('a');
+            cveLink.href = cve.link; // Replace with the actual feed link
+            cveLink.textContent = cve.title;
+            cveLink.target = '_blank'; // Open in a new tab
+            cveCell.appendChild(cveLink);
+            cveCell.style.border = '1px solid #ccc';
+            cveCell.style.padding = '10px';
+
+            // Description column
+            const descCell = document.createElement('td');
+            descCell.textContent = cve.description;
+            descCell.style.border = '1px solid #ccc';
+            descCell.style.padding = '10px';
+
+            row.appendChild(cveCell);
+            row.appendChild(descCell);
+            tbody.appendChild(row);
+        });
+
+        table.appendChild(tbody);
+        cveContainer.appendChild(table);
+    } catch (error) {
+        console.error('Error fetching or rendering CVE feed:', error);
+    }
+}
+
+
 // Fetch and render blogs when the page loads
 fetchCSBlogs();
 fetchMandiantBlogs();

@@ -110,6 +110,19 @@ async function fetchDRBlogs() {
 }
 
 
+async function fetchCVE() {
+    try {
+        const feed = await parser.parseURL('https://cvefeed.io/rssfeed/severity/high.xml');
+        const cve = feed.items.map(item => ({
+            title: item.title,
+            url: item.link
+        }));
+        return cve;
+    } catch (error) {
+        console.error('Error fetching RSS feed:', error.message);
+        return [];
+    }
+}
 
 app.get('/api/get-cs-blogs', async (req, res) => {
     try {
@@ -157,6 +170,19 @@ app.get('/api/get-dr-blogs', async (req, res) => {
         ]);
 
         res.json(drBlogs);
+    } catch (error) {
+        console.error('Error in API:', error.message);
+        res.status(500).json({ error: 'Failed to fetch blogs' });
+    }
+});
+
+app.get('/api/get-cve-feed', async (req, res) => {
+    try {
+        const [cve] = await Promise.all([
+            fetchCVE(),
+        ]);
+
+        res.json(cve);
     } catch (error) {
         console.error('Error in API:', error.message);
         res.status(500).json({ error: 'Failed to fetch blogs' });
