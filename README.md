@@ -10,3 +10,10 @@ The platform aims to bring threat intelligence from leading vendors under a sing
 - start your node server (index.js) > node index.js
 - Browse threatintel.html
 
+## Demo
+
+<img title="1" alt="Alt text" src="./out/Capture.PNG">
+
+<img title="1" alt="Alt text" src="./out/Capture2.PNG">
+
+<img title="1" alt="Alt text" src="./out/Capture3.PNG">
